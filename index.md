@@ -6,6 +6,14 @@ Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://j
 
 ### What are GANs?
 
+Generative Adversarial Networks (GAN) is a deep learning model and one of the most promising methods for unsupervised learning on complex distributions in recent years. The model produces a fairly good output through (at least) two modules in the framework: Generative Model and Discriminative Model.
+
+The generative model can be thought of as analogous to a team of counterfeiters,
+trying to produce fake currency and use it without detection, while the discriminative model is
+analogous to the police, trying to detect the counterfeit currency. Competition in this game drives
+both teams to improve their methods until the counterfeits are indistiguishable from the genuine
+articles.
+
 ### Intro to VAEs
 Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
 
