@@ -17,11 +17,6 @@ articles.
 
 ### Work Principle
 
-Suppose we have two networks: a generator, G and a discriminator, D.
-
-它们的功能分别是：
-G是一个生成图片的网络，它接收一个随机的噪声z，通过这个噪声生成图片，记做G(z)。
-D是一个判别网络，判别一张图片是不是“真实的”。它的输入参数是x，x代表一张图片，输出D（x）代表x为真实图片的概率，如果为1，就代表100%是真实的图片，而输出为0，就代表不可能是真实的图片。
 The adversarial modeling framework is most straightforward to apply when the models are both
 multilayer perceptrons. To learn the generator’s distribution pg over data x, we define a prior on
 input noise variables pz(z), then represent a mapping to data space as G(z; θg), where G is a
@@ -31,11 +26,12 @@ that x came from the data rather than pg. We train D to maximize the probability
 correct label to both training examples and samples from G. We simultaneously train G to minimize
 log(1 − D(G(z))):
 
-![image]()
+![image](formula1.png)
+
 ## Intro to VAEs
 
 Variational Encoder VAE (Variational Auto-encoder), like GAN, has become the most popular method for unsupervised learning of complex probability distributions.
-Generally 
+Generally, 
 
 ###
 
