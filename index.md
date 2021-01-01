@@ -17,13 +17,9 @@ articles.
 
 ### Work Principle
 
-The adversarial modeling framework is most straightforward to apply when the models are both
-multilayer perceptrons. To learn the generator’s distribution pg over data x, we define a prior on
-input noise variables pz(z), then represent a mapping to data space as G(z; θg), where G is a
-differentiable function represented by a multilayer perceptron with parameters θg. We also define a
-second multilayer perceptron D(x; θd) that outputs a single scalar. D(x) represents the probability
-that x came from the data rather than pg. We train D to maximize the probability of assigning the
-correct label to both training examples and samples from G. We simultaneously train G to minimize
+Take generating picture as an example. We have a generator G, which generates a picture marked as G(z) based on the input noise z. The input x for D, the discriminator, represents a picture, where D(x) is the probability that x is a real picture.
+
+We train D to maximize the probability of assigning the correct label to both training examples and samples from G. We simultaneously train G to minimize
 log(1 − D(G(z))):
 
 ![image](formula1.png)
@@ -31,9 +27,12 @@ log(1 − D(G(z))):
 ## Intro to VAEs
 
 Variational Encoder VAE (Variational Auto-encoder), like GAN, has become the most popular method for unsupervised learning of complex probability distributions.
-Generally, 
+Generally, it has an encoder and a decoder.
 
-###
+
+
+
+![image](pic1.png)
 
 
 
