@@ -24,6 +24,16 @@ log(1 − D(G(z))):
 
 ![image](formula1.png)
 
+### Experiments
+#### DataSet
+
+MNIST, the Toronto Face Database(TFD), and CIFAR-10.
+
+![image](pic2.png)
+
+
+
+
 ## Intro to VAEs
 
 Variational Encoder VAE (Variational Auto-encoder), like GAN, has become the most popular method for unsupervised learning of complex probability distributions.
@@ -32,8 +42,13 @@ Generally, it has an encoder and a decoder.
 
 
 
+
 ![image](pic1.png)
 
+Random samples from learned generative models of MNIST for different dimensionalities
+of latent space
+
+### Experiments
 
 
 **References**
