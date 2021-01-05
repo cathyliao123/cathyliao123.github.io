@@ -31,7 +31,7 @@ MNIST, the Toronto Face Database(TFD), and CIFAR-10.
 
 ![image](pic2.png)
 
-
+#### Coding
 ```Markdown
 class Generator(nn.Module):
     def __init__(self, ngpu):
@@ -119,7 +119,7 @@ netD.apply(weights_init)
 if opt.netD != '':
     netD.load_state_dict(torch.load(opt.netD))
 print(netD)
-
+```
 
 
 
