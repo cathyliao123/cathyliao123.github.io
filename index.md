@@ -31,7 +31,11 @@ MNIST, the Toronto Face Database(TFD), and CIFAR-10.
 
 ![image](pic2.png)
 
-#### Coding
+
+#### Generator
+
+
+##### Coding
 ```Markdown
 class Generator(nn.Module):
     def __init__(self, ngpu):
@@ -67,7 +71,7 @@ class Generator(nn.Module):
             output = self.main(input)
         return output
 ```
-Create a Generator
+
 ```Markdown
 netG = Generator(ngpu).to(device)
 netG.apply(weights_init)
