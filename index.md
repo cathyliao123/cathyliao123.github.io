@@ -27,7 +27,7 @@ log(1 − D(G(z))):
 #### DataSet
 Here we use the **CelebFaces Attributes Dataset(CelebA)**. It is a large-scale face attributes dataset with more than 200K celebrity images, each with 40 attribute annotations. The images in this dataset cover large pose variations and background clutter. CelebA has large diversities, large quantities, and rich annotations, including 10,177 number of identities, 202,599 number of face images, and 5 landmark locations, 40 binary attributes annotations per image.
 
-![image](sample image.png)
+![image](sampleimage.png)
 
 
 #### Generator
