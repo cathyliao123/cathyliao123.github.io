@@ -177,7 +177,7 @@ optimizerG = optim.Adam(netG.parameters(), lr=0.0002, betas=(opt.beta1, 0.999))
 ```
 
 #### Loss Function 
-With $D$ and $G$ setup, we can specify how they learn
+With Generator and Discriminator setup, we can specify how they learn
 through the loss functions and optimizers. We will use the Binary Cross
 Entropy loss function
 
