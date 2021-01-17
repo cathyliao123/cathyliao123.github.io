@@ -25,42 +25,55 @@ log(1 − D(G(z))):
 ![image](formula1.png)
 
 #### DataSet
-Here use the [**CelebFaces Attributes Dataset(CelebA)**](http://mmlab.ie.cuhk.edu.hk/projects/CelebA.html). It is a large-scale face attributes dataset with more than 200K celebrity images, each with 40 attribute annotations. The images in this dataset cover large pose variations and background clutter. CelebA has large diversities, large quantities, and rich annotations, including 10,177 number of identities, 202,599 number of face images, and 5 landmark locations, 40 binary attributes annotations per image.
+Here use the [**CelebFaces Attributes Dataset(CelebA)**](http://mmlab.ie.cuhk.edu.hk/projects/CelebA.html) and the [**MNIST Dataset**](http://yann.lecun.com/exdb/mnist/). 
+
+**CelebA** is a large-scale face attributes dataset with more than 200K celebrity images, each with 40 attribute annotations. The images in this dataset cover large pose variations and background clutter. CelebA has large diversities, large quantities, and rich annotations, including 10,177 number of identities, 202,599 number of face images, and 5 landmark locations, 40 binary attributes annotations per image.
+
+The **MNIST** database consists of about 60.000 black and white images of handwritten digits, each with size 28x28 pixels². This dataset is preprocessed according for training GANs.
 
 ![image](sampleimage.png)
 
 
-#### Generator
+#### Networks
 
-Generator
+First define the generator network. The generator generates new data instances that are "similar" to the training data, in our case celebA images. Generator takes random latent vector and output a "fake" image of the same size as the training image(3x64x64).
 
+In practice, this is
+accomplished through a series of strided two dimensional convolutional
+transpose layers, each paired with a 2d batch norm layer and a relu
+activation. The output of the generator is fed through a tanh function
+to return it to the input data range of $[-1,1]$. It is worth
+noting the existence of the batch norm functions after the
+conv-transpose layers, as this is a critical contribution of the DCGAN
+paper. These layers help with the flow of gradients during training. An
+image of the generator from the DCGAN paper is shown below.
+        
 ##### Coding
 ```Markdown
 class Generator(nn.Module):
     def __init__(self, ngpu):
         super(Generator, self).__init__()
-        self.ngpu = ngpu
+        self.ngpu = 1
         self.main = nn.Sequential(
             # input is Z, going into a convolution
-            nn.ConvTranspose2d(     nz, ngf * 8, 4, 1, 0, bias=False),
-            nn.BatchNorm2d(ngf * 8),
+            nn.ConvTranspose2d(100, 512, 4, 1, 0, bias=False),
+            nn.BatchNorm2d(512),
             nn.ReLU(True),
             # state size. (ngf*8) x 4 x 4
-            nn.ConvTranspose2d(ngf * 8, ngf * 4, 4, 2, 1, bias=False),
-            nn.BatchNorm2d(ngf * 4),
+            nn.ConvTranspose2d(512, 256, 4, 2, 1, bias=False),
+            nn.BatchNorm2d(256),
             nn.ReLU(True),
             # state size. (ngf*4) x 8 x 8
-            nn.ConvTranspose2d(ngf * 4, ngf * 2, 4, 2, 1, bias=False),
-            nn.BatchNorm2d(ngf * 2),
+            nn.ConvTranspose2d(256, 128, 4, 2, 1, bias=False),
+            nn.BatchNorm2d(128),
             nn.ReLU(True),
             # state size. (ngf*2) x 16 x 16
-            nn.ConvTranspose2d(ngf * 2,     ngf, 4, 2, 1, bias=False),
-            nn.BatchNorm2d(ngf),
+            nn.ConvTranspose2d(128, 64, 4, 2, 1, bias=False),
+            nn.BatchNorm2d(64),
             nn.ReLU(True),
-            # state size. (ngf) x 32 x 32
-            nn.ConvTranspose2d(    ngf,      nc, 4, 2, 1, bias=False),
+            # state size. (ngf) x 32 x 32 output:3x64x64
+            nn.ConvTranspose2d(64, 3, 4, 2, 1, bias=False),
             nn.Tanh()
-            # state size. (nc) x 64 x 64
         )
 
     def forward(self, input):
@@ -69,9 +82,7 @@ class Generator(nn.Module):
         else:
             output = self.main(input)
         return output
-```
 
-```Markdown
 netG = Generator(ngpu).to(device)
 netG.apply(weights_init)
 if opt.netG != '':
@@ -81,7 +92,7 @@ print(netG)
 
 #### Discriminator
 
-Discriminator
+The discriminator evaluate the authenticity of provided images; it classifies the images from the generator and the original image. Discriminator takes true of fake images and output the probability estimate ranging between 0 and 1.
 
 ##### Coding
 
@@ -91,23 +102,23 @@ class Discriminator(nn.Module):
         super(Discriminator, self).__init__()
         self.ngpu = ngpu
         self.main = nn.Sequential(
-            # input is (nc) x 64 x 64
-            nn.Conv2d(nc, ndf, 4, 2, 1, bias=False),
+            # input is 3 x 64 x 64
+            nn.Conv2d(3, 64, 4, 2, 1, bias=False),
             nn.LeakyReLU(0.2, inplace=True),
-            # state size. (ndf) x 32 x 32
-            nn.Conv2d(ndf, ndf * 2, 4, 2, 1, bias=False),
-            nn.BatchNorm2d(ndf * 2),
+            # state size. 64 x 32 x 32
+            nn.Conv2d(64, 128, 4, 2, 1, bias=False),
+            nn.BatchNorm2d(128),
             nn.LeakyReLU(0.2, inplace=True),
-            # state size. (ndf*2) x 16 x 16
-            nn.Conv2d(ndf * 2, ndf * 4, 4, 2, 1, bias=False),
-            nn.BatchNorm2d(ndf * 4),
+            # state size. (128) x 16 x 16
+            nn.Conv2d(128, 256, 4, 2, 1, bias=False),
+            nn.BatchNorm2d(256),
             nn.LeakyReLU(0.2, inplace=True),
-            # state size. (ndf*4) x 8 x 8
-            nn.Conv2d(ndf * 4, ndf * 8, 4, 2, 1, bias=False),
-            nn.BatchNorm2d(ndf * 8),
+            # state size. 256 x 8 x 8
+            nn.Conv2d(256, 512, 4, 2, 1, bias=False),
+            nn.BatchNorm2d(512),
             nn.LeakyReLU(0.2, inplace=True),
-            # state size. (ndf*8) x 4 x 4
-            nn.Conv2d(ndf * 8, 1, 4, 1, 0, bias=False),
+            # state size. 512 x 4 x 4
+            nn.Conv2d(512, 1, 4, 1, 0, bias=False),
             nn.Sigmoid()
         )
 
@@ -118,9 +129,7 @@ class Discriminator(nn.Module):
             output = self.main(input)
 
         return output.view(-1, 1).squeeze(1)
-```
-
-```Markdown        
+       
 netD = Discriminator(ngpu).to(device)
 netD.apply(weights_init)
 if opt.netD != '':
