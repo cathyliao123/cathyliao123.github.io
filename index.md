@@ -179,14 +179,95 @@ optimizerG = optim.Adam(netG.parameters(), lr=0.0002, betas=(opt.beta1, 0.999))
 #### Loss Function 
 With $D$ and $G$ setup, we can specify how they learn
 through the loss functions and optimizers. We will use the Binary Cross
-Entropy loss
+Entropy loss function
+
+![image](BCE)
+
+```Markdown
+# Initialize BCELoss function
+criterion = nn.BCELoss()
+
+# Create batch of latent vectors that we will use to visualize the progression of the generator
+fixed_noise = torch.randn(64, nz, 1, 1, device=device)
+
+# Establish convention for real and fake labels during training
+real_label = 1.
+fake_label = 0.
+```
+
+#### Training
+
+```Markdown
+# Training Loop
+
+# Lists to keep track of progress
+img_list = []
+G_losses = []
+D_losses = []
+iters = 0
+
+print("Starting Training Loop...")
+# For each epoch
+for epoch in range(num_epochs):
+    # For each batch in the dataloader
+    for i, data in enumerate(dataloader, 0):
+        
+        ############################
+        # (1) Update D network: maximize log(D(x)) + log(1 - D(G(z)))
+        ###########################
+        ## Train with all-real batch
+        netD.zero_grad()
+        # Format batch
+        real_cpu = data[0].to(device)
+        b_size = real_cpu.size(0)
+        label = torch.full((b_size,), real_label, dtype=torch.float, device=device)
+        # Forward pass real batch through D
+        output = netD(real_cpu).view(-1)
+        # Calculate loss on all-real batch
+        errD_real = criterion(output, label)
+        # Calculate gradients for D in backward pass
+        errD_real.backward()
+        D_x = output.mean().item()
+
+        ## Train with all-fake batch
+        # Generate batch of latent vectors
+        noise = torch.randn(b_size, nz, 1, 1, device=device)
+        # Generate fake image batch with G
+        fake = netG(noise)
+        label.fill_(fake_label)
+        # Classify all fake batch with D
+        output = netD(fake.detach()).view(-1)
+        # Calculate D's loss on the all-fake batch
+        errD_fake = criterion(output, label)
+        # Calculate the gradients for this batch
+        errD_fake.backward()
+        D_G_z1 = output.mean().item()
+        # Add the gradients from the all-real and all-fake batches
+        errD = errD_real + errD_fake
+        # Update D
+        optimizerD.step()
+
+        ############################
+        # (2) Update G network: maximize log(D(G(z)))
+        ###########################
+        netG.zero_grad()
+        label.fill_(real_label)  # fake labels are real for generator cost
+        # Since we just updated D, perform another forward pass of all-fake batch through D
+        output = netD(fake).view(-1)
+        # Calculate G's loss based on this output
+        errG = criterion(output, label)
+        # Calculate gradients for G
+        errG.backward()
+        D_G_z2 = output.mean().item()
+        # Update G
+        optimizerG.step()
+```
 
 
 
 **References**
 
-1.Ian Goodfellow, Jean Pouget-Abadie, Mehdi Mirza, Bing Xu, David Warde-Farley, Sherjil Ozair, Aaron
+Ian Goodfellow, Jean Pouget-Abadie, Mehdi Mirza, Bing Xu, David Warde-Farley, Sherjil Ozair, Aaron
 Courville, and Yoshua Bengio. Generative adversarial nets. In NIPS, 2014.
 
-2.Diederik P Kingma and Max Welling. Auto-encoding variational bayes. In ICLR, 2014
 
