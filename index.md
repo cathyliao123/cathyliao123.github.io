@@ -171,7 +171,7 @@ netD.apply(weights_init)
 Here we can use ``Adam`` as the optimization algorithm for both neural networks with a learning rate of 0.0002
 
 ```Markdown
-# setup optimizer
+#setup optimizer
 optimizerD = optim.Adam(netD.parameters(), lr=0.0002, betas=(opt.beta1, 0.999))
 optimizerG = optim.Adam(netG.parameters(), lr=0.0002, betas=(opt.beta1, 0.999))
 ```
@@ -184,13 +184,13 @@ Entropy loss function
 ![image](BCE)
 
 ```Markdown
-# Initialize BCELoss function
+#Initialize BCELoss function
 criterion = nn.BCELoss()
 
-# Create batch of latent vectors that we will use to visualize the progression of the generator
+#Create batch of latent vectors that we will use to visualize the progression of the generator
 fixed_noise = torch.randn(64, nz, 1, 1, device=device)
 
-# Establish convention for real and fake labels during training
+#Establish convention for real and fake labels during training
 real_label = 1.
 fake_label = 0.
 ```
@@ -198,16 +198,16 @@ fake_label = 0.
 #### Training
 
 ```Markdown
-# Training Loop
+#Training Loop
 
-# Lists to keep track of progress
+#Lists to keep track of progress
 img_list = []
 G_losses = []
 D_losses = []
 iters = 0
 
 print("Starting Training Loop...")
-# For each epoch
+#For each epoch
 for epoch in range(num_epochs):
     # For each batch in the dataloader
     for i, data in enumerate(dataloader, 0):
@@ -247,9 +247,8 @@ for epoch in range(num_epochs):
         # Update D
         optimizerD.step()
 
-        ############################
+        
         # (2) Update G network: maximize log(D(G(z)))
-        ###########################
         netG.zero_grad()
         label.fill_(real_label)  # fake labels are real for generator cost
         # Since we just updated D, perform another forward pass of all-fake batch through D
