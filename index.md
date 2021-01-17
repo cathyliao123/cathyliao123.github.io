@@ -29,7 +29,7 @@ Here use the [**CelebFaces Attributes Dataset(CelebA)**](http://mmlab.ie.cuhk.ed
 
 **CelebA** is a large-scale face attributes dataset with more than 200K celebrity images, each with 40 attribute annotations. The images in this dataset cover large pose variations and background clutter. CelebA has large diversities, large quantities, and rich annotations, including 10,177 number of identities, 202,599 number of face images, and 5 landmark locations, 40 binary attributes annotations per image.
 
-![image](sampleimage.png)
+![image](sampleim.png)
 
 First, we can resize & crop the images to a size of 32x32.
 
@@ -181,18 +181,18 @@ With $D$ and $G$ setup, we can specify how they learn
 through the loss functions and optimizers. We will use the Binary Cross
 Entropy loss function
 
-![image](BCE)
+![image](BCE.png)
 
 ```Markdown
-#Initialize BCELoss function
-criterion = nn.BCELoss()
+ ##Initialize BCELoss function
+ criterion = nn.BCELoss()
 
-#Create batch of latent vectors that we will use to visualize the progression of the generator
-fixed_noise = torch.randn(64, nz, 1, 1, device=device)
+ #Create batch of latent vectors that we will use to visualize the progression of the generator
+ fixed_noise = torch.randn(64, nz, 1, 1, device=device)
 
-#Establish convention for real and fake labels during training
-real_label = 1.
-fake_label = 0.
+ #Establish convention for real and fake labels during training
+ real_label = 1.
+ fake_label = 0.
 ```
 
 #### Training
@@ -211,10 +211,8 @@ print("Starting Training Loop...")
 for epoch in range(num_epochs):
     # For each batch in the dataloader
     for i, data in enumerate(dataloader, 0):
-        
-        ############################
-        # (1) Update D network: maximize log(D(x)) + log(1 - D(G(z)))
-        ###########################
+            
+        # (1) Update D network: maximize log(D(x)) + log(1 - D(G(z))
         ## Train with all-real batch
         netD.zero_grad()
         # Format batch
@@ -247,7 +245,6 @@ for epoch in range(num_epochs):
         # Update D
         optimizerD.step()
 
-        
         # (2) Update G network: maximize log(D(G(z)))
         netG.zero_grad()
         label.fill_(real_label)  # fake labels are real for generator cost
@@ -262,6 +259,9 @@ for epoch in range(num_epochs):
         optimizerG.step()
 ```
 
+#### Results
+
+![image](result.png)
 
 
 **References**
