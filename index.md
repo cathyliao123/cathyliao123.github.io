@@ -1,4 +1,4 @@
-## _Generative Adversarial Nets_ and _Variational Auto-Encoders_
+## _Generative Adversarial Nets_
 
 
 
@@ -25,13 +25,53 @@ log(1 − D(G(z))):
 ![image](formula1.png)
 
 #### DataSet
-Here use the [**CelebFaces Attributes Dataset(CelebA)**](http://mmlab.ie.cuhk.edu.hk/projects/CelebA.html) and the [**MNIST Dataset**](http://yann.lecun.com/exdb/mnist/). 
+Here use the [**CelebFaces Attributes Dataset(CelebA)**](http://mmlab.ie.cuhk.edu.hk/projects/CelebA.html)
 
 **CelebA** is a large-scale face attributes dataset with more than 200K celebrity images, each with 40 attribute annotations. The images in this dataset cover large pose variations and background clutter. CelebA has large diversities, large quantities, and rich annotations, including 10,177 number of identities, 202,599 number of face images, and 5 landmark locations, 40 binary attributes annotations per image.
 
-The **MNIST** database consists of about 60.000 black and white images of handwritten digits, each with size 28x28 pixels². This dataset is preprocessed according for training GANs.
-
 ![image](sampleimage.png)
+
+First, we can resize & crop the images to a size of 32x32.
+
+```Markdown
+import numpy as np 
+import pandas as pd 
+import matplotlib.pyplot as plt 
+import torch 
+import torch.nn as nn 
+import torch.nn.functional as F 
+import torch.optim as optim
+from torch.utils.data import DataLoader
+from torchvision import datasets, transforms 
+
+# data was extracted to this folder
+dataset=datasets.ImageFolder(
+    root=dataroot,
+    transform=transforms.Compose([
+        transforms.Resize(64),
+        transforms.CenterCrop(64),
+        transforms.ToTensor(),
+        transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
+        ])
+        )
+
+dataloader=DataLoader(dataset,batch_size=128,shuffle=True,num_workers=2)
+```
+
+
+Define the weight function that to be used to the models later
+
+```Markdown
+# custom weights initialization called on netG and netD
+def weights_init(m):
+    classname = m.__class__.__name__
+    if classname.find('Conv') != -1:
+        nn.init.normal_(m.weight.data, 0.0, 0.02)
+    elif classname.find('BatchNorm') != -1:
+        nn.init.normal_(m.weight.data, 1.0, 0.02)
+        nn.init.constant_(m.bias.data, 0)
+```
+
 
 
 #### Networks
@@ -42,13 +82,8 @@ In practice, this is
 accomplished through a series of strided two dimensional convolutional
 transpose layers, each paired with a 2d batch norm layer and a relu
 activation. The output of the generator is fed through a tanh function
-to return it to the input data range of $[-1,1]$. It is worth
-noting the existence of the batch norm functions after the
-conv-transpose layers, as this is a critical contribution of the DCGAN
-paper. These layers help with the flow of gradients during training. An
-image of the generator from the DCGAN paper is shown below.
+to return it to the input data range of [-1,1]. 
         
-##### Coding
 ```Markdown
 class Generator(nn.Module):
     def __init__(self, ngpu):
@@ -82,19 +117,16 @@ class Generator(nn.Module):
         else:
             output = self.main(input)
         return output
-
+```       
+    
+```Markdown
 netG = Generator(ngpu).to(device)
 netG.apply(weights_init)
-if opt.netG != '':
-    netG.load_state_dict(torch.load(opt.netG))
-print(netG)
 ```
 
 #### Discriminator
 
 The discriminator evaluate the authenticity of provided images; it classifies the images from the generator and the original image. Discriminator takes true of fake images and output the probability estimate ranging between 0 and 1.
-
-##### Coding
 
 ```Markdown
 class Discriminator(nn.Module):
@@ -132,40 +164,23 @@ class Discriminator(nn.Module):
        
 netD = Discriminator(ngpu).to(device)
 netD.apply(weights_init)
-if opt.netD != '':
-    netD.load_state_dict(torch.load(opt.netD))
-print(netD)
 ```
 
+#### Optimizer 
 
-#### Optimizer
-
-Here use ``Adam`` as the optimization algorithm for both neural networks 
+Here we can use ``Adam`` as the optimization algorithm for both neural networks with a learning rate of 0.0002
 
 ```Markdown
 # setup optimizer
-optimizerD = optim.Adam(netD.parameters(), lr=opt.lr, betas=(opt.beta1, 0.999))
-optimizerG = optim.Adam(netG.parameters(), lr=opt.lr, betas=(opt.beta1, 0.999))
+optimizerD = optim.Adam(netD.parameters(), lr=0.0002, betas=(opt.beta1, 0.999))
+optimizerG = optim.Adam(netG.parameters(), lr=0.0002, betas=(opt.beta1, 0.999))
 ```
 
+#### Loss Function 
+With $D$ and $G$ setup, we can specify how they learn
+through the loss functions and optimizers. We will use the Binary Cross
+Entropy loss
 
-
-
-## Intro to VAEs
-
-Variational Encoder VAE (Variational Auto-encoder), like GAN, has become the most popular method for unsupervised learning of complex probability distributions.
-Generally, it has an encoder and a decoder.
-
-
-
-
-
-![image](pic1.png)
-
-Random samples from learned generative models of MNIST for different dimensionalities
-of latent space
-
-### Experiments
 
 
 **References**
